@@ -1,0 +1,18 @@
+# Ambiente virtual
+venv/
+
+# Cache do Python
+__pycache__/
+*.pyc
+
+# Relatórios gerados pelo scanner
+reports/*.json
+reports/*.csv
+reports/*.html
+
+# Configurações do VS Code
+.vscode/
+
+# Arquivos do sistema
+.DS_Store
+Thumbs.db
