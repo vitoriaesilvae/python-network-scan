@@ -33,10 +33,12 @@ def scan_port(ip, porta, timeout=1):
 	#Retorna true se o resultado for 0 (porta aberta), false caso contrário.
 	return resultado == 0
 
-def scan_host(ip, portas=None, timeout=1):
+def scan_host_threaded(ip, portas=None, timeout=1, max_workers=10):
 	"""
 	Varre uma lista de portas em um host e devolve a lista das portas abertas.
 	"""
+	from concurrent.futures import ThreadPoolExecutor #biblioteca que permite criar threads para executar funções em paralelo.
+	from functools import partial #importa o método partial da biblioteca functools
 
 	if portas is None:
 		portas = PORTAS_COMUNS
@@ -45,16 +47,20 @@ def scan_host(ip, portas=None, timeout=1):
 
 	print(f"Host: {ip}")
 
-	#Verifica a conexão com cada porta da lista, chamando o método acima scan_port.
-	for porta in portas:
-		if scan_port(ip, porta, timeout):
-			print(f"{porta} ABERTA")
-			portas_abertas.append(porta)
+	with ThreadPoolExecutor(max_workers=max_workers) as executor:
+		#A função adaptada usa partial para congelar o parâmetro ip e timeout do metodo scan_port, já que executor.map recebe apenas uma lista de parâmetro.
+		funcao_adaptada = partial(scan_port, ip, timeout=timeout)
 
-	print("\n")
-
+		#Agora o executor passa por cada porta da lista usando a função adaptada
+		resultado = executor.map(funcao_adaptada,portas)
+		
+		for porta, ativo in zip(portas, resultado):
+			if ativo:
+				portas_abertas.append(porta)
+	
+	print(f"Portas abertas: \n{portas_abertas}")
 	return portas_abertas
-
+		
 #Código para quando o arquivo é executado sozinho:
 if __name__ == "__main__":
 	if len(sys.argv) < 2:
@@ -71,6 +77,6 @@ if __name__ == "__main__":
 	else:
 		portas_alvo = PORTAS_COMUNS
 
-	abertas = scan_host(ip_alvo, portas_alvo)
+	abertas = scan_host_threaded(ip_alvo, portas_alvo)
 
 	print(f"Total de portas abertas: {len(abertas)}")

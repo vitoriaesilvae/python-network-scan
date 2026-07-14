@@ -16,14 +16,14 @@ def run_scan(rede):
     resultados = {} 
 
     #descobrir hosts ativos
-    hosts_ativos = ping.ping_sweep(rede)
+    hosts_ativos = ping.ping_sweep_threaded(rede)
 
     #Monta o dicionário para cada host ativo.
     for host in hosts_ativos:
         resultados[host] = {}
 
         #Varre as portas do host ativo.
-        portas_abertas = port_scanner.scan_host(host)
+        portas_abertas = port_scanner.scan_host_threaded(host)
 
         #Para cada porta aberta, coleta o banner e o nome de domínio.
         for porta in portas_abertas:
