@@ -6,29 +6,48 @@ Este projeto foi construído focado em demonstrar a evolução de arquitetura de
 
 ---
 
-## Estrutura das Branches 
+## Estrutura das Branches
 
 A branch principal contém a versão inicial, sequencial e didática do scanner. Para visualizar as implementações focadas em performance e concorrência, alterne entre as branches do repositório:
 
-*   **`main`** (Esta branch): Versão base, sequencial e estruturada.
-*   **`otimizacao-async`**: Versão otimizada com async.
+*   **`main`**: Versão base, sequencial e estruturada.
+*   **`otimizacao-async`** (Esta branch): Versão otimizada com `asyncio`, usando um único event loop e corrotinas em vez de threads.
 *   **`otimizacao-threads`**: Versão de alta performance que implementa multithreading.
 
 ---
 
-## Funcionalidades da Versão Base
+## Funcionalidades da Versão Assíncrona
 
-*   **Descoberta de Hosts:** Identificação de IPs ativos no segmento de rede.
-*   **Varredura de Portas:** Escaneamento sequencial das portas TCP mais comuns em cada host.
-*   **Banner Grabbing:** Conexão direta com a porta aberta para ler o banner do serviço (útil para identificar versões de softwares rodando).
-*   **DNS Reverso:** Tradução dos endereços IP em nomes de domínio legíveis.
+*   **Descoberta de Hosts:** Ping sweep de toda a faixa de rede executado de forma concorrente, com `asyncio.gather` e `asyncio.Semaphore` limitando quantos pings estão "em voo" ao mesmo tempo.
+*   **Varredura de Portas:** Escaneamento das portas TCP mais comuns em cada host, também concorrente por host, usando `asyncio.open_connection`.
+*   **Banner Grabbing:** Conexão assíncrona com cada porta aberta para ler o banner do serviço (útil para identificar versões de softwares rodando).
+*   **DNS Reverso:** Tradução dos endereços IP em nomes de domínio legíveis. Como `socket.gethostbyaddr` é bloqueante, essa chamada roda em uma thread auxiliar via `loop.run_in_executor`, sem travar o event loop principal.
 *   **Dados Estruturados:** Exportação dos resultados em formato JSON, HTML e CSV.
 
-Exemplo do retorno estruturado json:
+### Por que asyncio em vez de threads?
+
+Diferente da branch `otimizacao-threads`, aqui a concorrência acontece dentro de uma única thread. Cada tarefa (pingar um host, escanear uma porta, capturar um banner) é uma corrotina que cede o controle voluntariamente sempre que espera uma resposta de rede (`await`), permitindo que o event loop cuide de outras tarefas nesse meio tempo. Isso reduz o custo de memória por conexão em comparação a threads, o que se torna mais perceptível em faixas de rede grandes.
+
+### Exemplo do retorno estruturado (JSON)
+
 ```json
 {
-  "192.168.1.10": {
-    "22": {"servico": "SSH", "banner": "SSH-2.0-OpenSSH_9.3", "nome_dominio": "pc-vitoria"},
-    "80": {"servico": "HTTP", "banner": null, "nome_dominio": "pc-vitoria"}
-  }
+    "hosts": [
+        {
+            "host": "192.168.1.10",
+            "hostname": "pc-vitoria",
+            "portas": [
+                {"porta": 22, "servico": "SSH", "banner": "SSH-2.0-OpenSSH_9.3"},
+                {"porta": 80, "servico": "HTTP", "banner": null}
+            ]
+        },
+        {
+            "host": "192.168.1.1",
+            "hostname": null,
+            "portas": [
+                {"porta": 443, "servico": "HTTPS", "banner": null}
+            ]
+        }
+    ]
 }
+```
