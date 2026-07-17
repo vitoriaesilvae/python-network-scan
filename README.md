@@ -6,6 +6,15 @@ Este projeto foi construído focado em demonstrar a evolução de arquitetura de
 
 ---
 
+## ⚠️ Aviso Legal
+
+Esta ferramenta foi desenvolvida para fins educacionais. Utilize-a
+apenas em redes próprias ou com autorização explícita do responsável
+pela rede. Escanear redes de terceiros sem permissão pode configurar
+crime, conforme a legislação local.
+
+---
+
 ## Estrutura das Branches 
 
 A branch principal contém a versão inicial, sequencial e didática do scanner. Para visualizar as implementações focadas em performance e concorrência, alterne entre as branches do repositório:
