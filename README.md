@@ -4,6 +4,14 @@ Um scanner de rede simples e estruturado desenvolvido em Python para identificar
 
 Este projeto foi construído focado em demonstrar a evolução de arquitetura de código, otimização de performance e boas práticas de controle de versão utilizando Git.
 
+O código foi inteiramente escrito utilizando Linux, então o comando ping está adaptado para este sistema operacional.
+Para utilizar em Windows será necessário alterar a escrita do comando de rede ping.
+
+Uso:
+python3 scanner.py (seu ip)
+
+Exemplo:
+python3 scanner.py 192.168.1.1/24
 ---
 
 ## ⚠️ Aviso Legal
