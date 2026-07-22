@@ -17,8 +17,8 @@ import asyncio #biblioteca para programação assíncrona
 import ipaddress
 import socket
 
-PORTAS_COMUNS = [21, 22, 23, 25, 53, 80, 110, 139, 143, 443, 445, 3389, 8080]
-PORTAS_QUE_PRECISAM_DE_REQUISICAO = {80, 8080}
+PORTAS_COMUNS = range(1,1000)
+PORTAS_QUE_PRECISAM_DE_REQUISICAO = {80}
 
 async def ping_host(ip):
     #O await indica ao python para adiantar outras tarefas assíncronas enquanto essa não termina
@@ -67,7 +67,7 @@ async def grab_banner(ip, porta, timeout=2):
         reader, writer = await asyncio.wait_for(conexao, timeout=timeout)
 
         if porta in PORTAS_QUE_PRECISAM_DE_REQUISICAO:
-            requisicao = f"HEAD / HTTP/1.1\r\nHost: {ip}\r\nConnection: close\r\n\r\n"
+            requisicao = f"HEAD / HTTP/1.1\r\nHost: {ip}\r\nUser-Agent: Scan\r\nConnection: close\r\n\r\n"
             #writer.write() escreve os dados no stream de saída, e o encode() converte a string em bytes, que é o formato esperado pelo writer.
             writer.write(requisicao.encode())
             #writer.drain() é usado para garantir que todos os dados foram enviados antes de continuar, caso contrário o scan poderia falhar em portas que demoram para responder.
@@ -100,7 +100,7 @@ async def dns_reverso(ip, portas=None, concorrencia_port=50):
     except(socket.herror, socket.gaierror):
         return None
     
-async def scan_host(ip, portas=None, concorrencia_port=50):
+async def scan_host(ip, portas=None, concorrencia_port=100):
     if portas is None:
         portas = PORTAS_COMUNS
 
@@ -134,7 +134,9 @@ async def run_scan(rede, concorrencia_hosts=10):
         async with semaforo:
             return await scan_single_host(ip)
         
+    print("\nEscaneando portas...")  
     resultados = await asyncio.gather(*(processar(ip) for ip in hosts_ativos))
+
     return resultados
 
 async def main():
