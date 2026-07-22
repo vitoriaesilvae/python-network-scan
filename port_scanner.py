@@ -9,7 +9,7 @@ import socket #biblioteca que permite abrirmos conexões TCP.
 import sys #biblioteca que permite acessar informações e funcionalidades do interpretador python.
 
 #Lista padrão de portas comuns
-PORTAS_COMUNS = [21,22,23,25,53,80,110,139,143,443,445,3389,8080]
+PORTAS_COMUNS = range(1,1000)
 
 def scan_port(ip, porta, timeout=1):
 	"""
