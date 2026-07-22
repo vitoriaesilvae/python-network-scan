@@ -14,7 +14,7 @@ import sys #biblioteca que permite acessar informações e funcionalidades do in
 Em algumas portas é preciso enviar uma requisição para que o serviço responda com informações sobre ele.
 Por exemplo, para HTTP, podemos enviar uma requisição GET e o servidor irá responder com informações
 """
-PORTAS_QUE_REQUEREM_REQUISICAO = {80, 8080}
+PORTAS_QUE_REQUEREM_REQUISICAO = {80}
 # A porta https (443) não é suportada, pois o banner grabbing não funciona com SSL/TLS.
 
 def banner_grabbing(ip, porta, timeout=2):
