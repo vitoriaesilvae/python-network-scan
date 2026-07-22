@@ -1,10 +1,17 @@
 # Scanner de Rede em Python
 
-No código base temos um gargalo muito grande: o tempo de espera das respostas da rede. Então nessa otimização useremos o multithreading, um processo que envolve várias linhas de exe# Scanner de Rede em Python
-
 Um scanner de rede simples e estruturado desenvolvido em Python para identificar hosts ativos na rede, escanear portas abertas, capturar banners de serviços ativos e resolver nomes de domínio (DNS).
 
 Este projeto foi construído focado em demonstrar a evolução de arquitetura de código, otimização de performance e boas práticas de controle de versão utilizando Git.
+
+O código foi inteiramente escrito utilizando Linux, então o comando ping está adaptado para este sistema operacional.
+Para utilizar em Windows será necessário alterar a escrita do comando de rede ping.
+
+Uso:
+python3 scanner.py (seu ip)
+
+Exemplo:
+python3 scanner.py 192.168.1.1/24
 
 ---
 
